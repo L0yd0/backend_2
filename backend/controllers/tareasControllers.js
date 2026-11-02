@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler')
 const Tarea = require('../models/tareasModel')
 
 const getTareas = asyncHandler(async(req,res)=>{
-    const tareas = await Tarea.find({user:req.user.id_usuario})
+    const tareas = await Tarea.find({user:req.user.id})
     res.status(200).json(tareas)
 })
 
@@ -38,9 +38,13 @@ const updateTareas = asyncHandler(async(req,res)=>{
 })
 
 const deleteTareas = asyncHandler(async(req,res)=>{
+    const tarea = await Tarea.findOne({
+        _id: req.params.id,
+        user: req.user.id
+    })
     if(!tarea){
         res.status(404)
-        throw new Error('la tarea no existe')
+        throw new Error('la tarea no es de este usuario')
     }else{
         await tarea.deleteOne()
         res.status(200).json({id: req.params.id})
